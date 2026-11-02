@@ -7,12 +7,12 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:51:45 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/02 09:50:23 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/02 13:00:39 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 from typing import Any
-import numpy  # type: ignore
+import numpy
 from .data_parsing import parse_functions_definition, parse_prompts
 from llm_sdk import Small_LLM_Model  # type: ignore
 from .fsm import FSM, FSMState
@@ -126,7 +126,7 @@ def main() -> None:
             if param_type == "string":
                 param_dict[param] = value
             fsm.next_param()
-            if fsm.state != FSMState.END:  # type: ignore
+            if fsm.state != FSMState.END:
                 emit_fixed(ids_array, model, ", ")
         emit_fixed(ids_array, model, "}}")
 
