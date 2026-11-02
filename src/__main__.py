@@ -7,12 +7,12 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:51:45 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/02 07:46:30 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/02 09:50:23 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 from typing import Any
-import numpy
+import numpy  # type: ignore
 from .data_parsing import parse_functions_definition, parse_prompts
 from llm_sdk import Small_LLM_Model  # type: ignore
 from .fsm import FSM, FSMState
@@ -101,10 +101,10 @@ def main() -> None:
             emit_fixed(ids_array, model, f"\"{param}\": ")
 
             for _ in range(max_token):
-                logits: list[float] = model.get_logits_from_input_ids(ids_array)
-                valid_ids: list[int] = fsm.get_valid_ids(vocabs)
-                masked: list[float] = mask_logits(logits, valid_ids)
-                next_token: int = masked.index(max(masked))
+                logits = model.get_logits_from_input_ids(ids_array)
+                valid_ids = fsm.get_valid_ids(vocabs)
+                masked = mask_logits(logits, valid_ids)
+                next_token = masked.index(max(masked))
                 ids_array.append(next_token)
                 if param_type == "number":
                     token_str = vocabs[next_token]
@@ -115,22 +115,18 @@ def main() -> None:
                         break
                 if param_type == "string":
                     candidate_ids.append(next_token)
-                    # print(f"token_str: {vocabs[next_token]}")
                     candidate_text = model.decode(candidate_ids)
-                    # print(f"candidate_text: ===\n{candidate_text}\n===")
                     if '"' in candidate_text:
                         parts = candidate_text.split('"')
-                        # print(f"===\n{parts}\n===")
                         if len(parts) == 3:
                             value = parts[1]
-                            # print(f"value: ===\n{value}\n===")
                             break
             if param_type == "number":
                 param_dict[param] = float(value)
             if param_type == "string":
                 param_dict[param] = value
             fsm.next_param()
-            if fsm.state != FSMState.END:
+            if fsm.state != FSMState.END:  # type: ignore
                 emit_fixed(ids_array, model, ", ")
         emit_fixed(ids_array, model, "}}")
 
