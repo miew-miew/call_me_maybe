@@ -1,9 +1,8 @@
 export UV_CACHE_DIR=$(HOME)/goinfre/uv-cache
 export HF_HOME=$(HOME)/goinfre/huggingface-cache
+export UV_PROJECT_ENVIRONMENT=$(HOME)/goinfre/call_me_maybe/.venv
 
 install:
-# 	@echo ${UV_CACHE_DIR}
-# 	@echo ${HF_HOME}
 	uv sync
 
 run:
