@@ -7,25 +7,29 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/30 04:32:33 by frazanak            #+#    #+#            #
-#   Updated: 2026/10/26 07:48:29 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/02 10:06:52 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
+from typing import TypeVar
 from pydantic import TypeAdapter, ValidationError
 from .data_loader import load_content
 from .models import Prompt, FunctionDefinition
 from .validation_errors import print_validation_errors
 
 
+M = TypeVar('M', bound=Prompt | FunctionDefinition)
+
+
 def parse_file(
     filepath: str,
-    model: Prompt | FunctionDefinition
-) -> list[Prompt] | list[FunctionDefinition] | None:
+    model: type[M]
+) -> list[M] | None:
     content: str | None = load_content(filepath)
     if not content or content.strip() == '':
         print(f"No content found in {filepath}")
         return None
-    adapter = TypeAdapter(list[model])
+    adapter = TypeAdapter(list[M])
     try:
         return adapter.validate_json(content)
     except ValidationError as e:

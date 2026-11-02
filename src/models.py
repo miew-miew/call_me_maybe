@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:05:11 by frazanak            #+#    #+#            #
-#   Updated: 2026/10/18 07:57:18 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/02 10:07:13 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -38,4 +38,3 @@ class OutputValidator(BaseModel):
     name: str
     parameters: dict[str, float | str]
     model_config = ConfigDict(extra="forbid")
-
