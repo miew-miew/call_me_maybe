@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:51:45 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/02 13:00:39 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/03 08:04:20 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -20,6 +20,16 @@ from .constrained import load_vocab, mask_logits
 
 
 def build_system_prompt(user_prompt: str) -> str:
+    """
+    Build a system prompt with available functions
+    and the user request.
+
+    Args:
+        user_prompt (str): The user's request.
+
+    Returns:
+        str: The formatted system prompt.
+    """
     definitions = parse_functions_definition()
     if not definitions:
         return user_prompt
@@ -52,6 +62,14 @@ def emit_fixed(
     model: Small_LLM_Model,
     text: str,
 ) -> None:
+    """
+    Encode the given text and add its token IDs to the array.
+
+    Args:
+        ids_array (list[int]): The array to store the token IDs.
+        model (Small_LLM_Model): The model used to encode the text.
+        text (str): The text to encode.
+    """
     fixed_ids = numpy.array(model.encode(text), copy=None)[0].tolist()
     ids_array.extend(fixed_ids)
 
