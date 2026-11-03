@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: Invalid date        by                     #+#    #+#            #
-#   Updated: 2026/10/26 07:46:51 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/03 10:40:53 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -16,13 +16,30 @@ from .models import FunctionDefinition
 
 
 class FSMState(Enum):
+    """Define the possible states of the finite state machine."""
     NAME = "name"
     PARAM_VALUE = "param_value"
     END = "end"
 
 
 class FSM:
+    """Represent a finite state machine.
+
+    Attributes:
+        state (FSMState): Current state.
+        definitions (list[FunctionDefinition]): Available function definitions.
+        selected_func (FunctionDefinition | None): Selected function.
+        _params (list[str]): Collected parameters.
+        _current_param_pos (int): Current parameter position.
+        _accumulated_name (str): Accumulated function name.
+    """
     def __init__(self, definitions: list[FunctionDefinition]) -> None:
+        """Initialize the finite state machine.
+
+        Args:
+            definitions (list[FunctionDefinition]): Available function
+                definitions.
+        """
         self.state = FSMState.NAME
         self.definitions = definitions
         self.selected_func: FunctionDefinition | None = None
