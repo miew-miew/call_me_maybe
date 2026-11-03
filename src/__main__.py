@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:51:45 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/03 08:04:20 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/03 08:33:55 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -20,9 +20,7 @@ from .constrained import load_vocab, mask_logits
 
 
 def build_system_prompt(user_prompt: str) -> str:
-    """
-    Build a system prompt with available functions
-    and the user request.
+    """Build a system prompt with available functions and the user request.
 
     Args:
         user_prompt (str): The user's request.
@@ -62,8 +60,7 @@ def emit_fixed(
     model: Small_LLM_Model,
     text: str,
 ) -> None:
-    """
-    Encode the given text and add its token IDs to the array.
+    """Encode the given text and add its token IDs to the array.
 
     Args:
         ids_array (list[int]): The array to store the token IDs.
