@@ -15,6 +15,11 @@ from pydantic import ValidationError
 
 
 def print_validation_errors(e: ValidationError) -> None:
+    """Print human-readable messages from a pydantic ValidationError.
+
+    Args:
+        e: The ValidationError to format and print.
+    """
     errors = e.errors()
     for error in errors:
         if error["type"] == "extra_forbidden":
@@ -28,4 +33,3 @@ def print_validation_errors(e: ValidationError) -> None:
                   f" from the input: {usr_input}")
         else:
             print(error["msg"])
-        # print(error)

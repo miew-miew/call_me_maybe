@@ -16,16 +16,22 @@ from typing import Literal
 
 
 class Prompt(BaseModel):
+    """A user prompt input model."""
+
     prompt: str = Field(...)
     model_config = ConfigDict(extra="forbid")
 
 
 class ParamType(BaseModel):
+    """A parameter type descriptor."""
+
     type: Literal["number", "string"]
     model_config = ConfigDict(extra="forbid")
 
 
 class FunctionDefinition(BaseModel):
+    """A callable function definition with its parameters and return type."""
+
     name: str = Field(...)
     description: str = Field(...)
     parameters: dict[str, ParamType] = Field(...)
@@ -34,6 +40,8 @@ class FunctionDefinition(BaseModel):
 
 
 class OutputValidator(BaseModel):
+    """Validates the output of a function call prediction."""
+
     prompt: str
     name: str
     parameters: dict[str, float | str]
