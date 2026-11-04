@@ -12,11 +12,14 @@
 # ########################################################################### #
 
 from typing import Any
+import json
+import os
 import numpy
 from .data_parsing import parse_functions_definition, parse_prompts
 from llm_sdk import Small_LLM_Model  # type: ignore
 from .fsm import FSM, FSMState
 from .constrained import load_vocab, mask_logits
+from .models import OutputValidator
 
 
 def build_system_prompt(user_prompt: str) -> str:
@@ -72,6 +75,7 @@ def emit_fixed(
 
 
 def main() -> None:
+    """Run the function-calling pipeline and write results to JSON."""
     prompts = parse_prompts()
     if not prompts:
         return
@@ -81,6 +85,7 @@ def main() -> None:
     model = Small_LLM_Model()
     vocab_path: str = model.get_path_to_vocab_file()
     vocabs: dict[int, str] = load_vocab(vocab_path)
+    results: list[dict[str, float | str]] = []
     for p in prompts:
         fsm = FSM(definitions)
         full_prompt = build_system_prompt(p.prompt)
@@ -150,7 +155,13 @@ def main() -> None:
             "name": fsm.selected_func.name,
             "parameters": param_dict
         }
-        print(result)
+        OutputValidator(**result)
+        results.append(result)
+
+    output_path = "data/output/function_calling_results.json"
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as file:
+        json.dump(results, file, indent=2)
 
 
 if __name__ == "__main__":
