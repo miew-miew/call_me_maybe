@@ -28,11 +28,11 @@ def parse_file(
     """Parse a JSON file into a list of model instances.
 
     Args:
-        filepath (str): The path to the JSON file.
-        model (type[M]): The model class used for validation.
+        filepath: Path to the JSON file.
+        model: The model class used for validation.
 
     Returns:
-        list[M] | None: The validated list of models, or None if parsing fails.
+        The validated list of models, or None if parsing fails.
     """
     content: str | None = load_content(filepath)
     if not content or content.strip() == '':
@@ -50,7 +50,7 @@ def parse_prompts() -> list[Prompt] | None:
     """Parse the prompts from the JSON file.
 
     Returns:
-        list[Prompt] | None: The list of prompts, or None if parsing fails.
+        The list of prompts, or None if parsing fails.
     """
     return parse_file("data/input/function_calling_tests.json", Prompt)
 
@@ -59,8 +59,7 @@ def parse_functions_definition() -> list[FunctionDefinition] | None:
     """Parse the function definitions from the JSON file.
 
     Returns:
-        list[FunctionDefinition] | None: The list of function definitions,
-        or None if parsing fails.
+        The list of function definitions, or None if parsing fails.
     """
     return parse_file("data/input/functions_definition.json",
                       FunctionDefinition)

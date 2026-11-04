@@ -15,10 +15,10 @@ def load_content(filepath: str) -> str | None:
     """Load and return the content of a file.
 
     Args:
-        filepath (str): The path to the file.
+        filepath: Path to the file.
 
     Returns:
-        str | None: The file content, or None if an error occurs.
+        The file content, or None if an error occurs.
     """
     try:
         with open(filepath) as file:

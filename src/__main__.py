@@ -23,10 +23,10 @@ def build_system_prompt(user_prompt: str) -> str:
     """Build a system prompt with available functions and the user request.
 
     Args:
-        user_prompt (str): The user's request.
+        user_prompt: The user's request.
 
     Returns:
-        str: The formatted system prompt.
+        The formatted system prompt.
     """
     definitions = parse_functions_definition()
     if not definitions:
@@ -60,12 +60,12 @@ def emit_fixed(
     model: Small_LLM_Model,
     text: str,
 ) -> None:
-    """Encode the given text and add its token IDs to the array.
+    """Encode text and append its token IDs to ids_array.
 
     Args:
-        ids_array (list[int]): The array to store the token IDs.
-        model (Small_LLM_Model): The model used to encode the text.
-        text (str): The text to encode.
+        ids_array: The array to store the token IDs.
+        model: The model used to encode the text.
+        text: The text to encode.
     """
     fixed_ids = numpy.array(model.encode(text), copy=None)[0].tolist()
     ids_array.extend(fixed_ids)

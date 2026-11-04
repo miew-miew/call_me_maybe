@@ -16,29 +16,20 @@ from .models import FunctionDefinition
 
 
 class FSMState(Enum):
-    """Define the possible states of the finite state machine."""
+    """Possible states of the FSM."""
     NAME = "name"
     PARAM_VALUE = "param_value"
     END = "end"
 
 
 class FSM:
-    """Represent a finite state machine.
+    """Finite state machine for constrained function-call decoding."""
 
-    Attributes:
-        state (FSMState): Current state.
-        definitions (list[FunctionDefinition]): Available function definitions.
-        selected_func (FunctionDefinition | None): Selected function.
-        _params (list[str]): Collected parameters.
-        _current_param_pos (int): Current parameter position.
-        _accumulated_name (str): Accumulated function name.
-    """
     def __init__(self, definitions: list[FunctionDefinition]) -> None:
-        """Initialize the finite state machine.
+        """Initialize the FSM.
 
         Args:
-            definitions (list[FunctionDefinition]): Available function
-                definitions.
+            definitions: Available function definitions to match against.
         """
         self.state = FSMState.NAME
         self.definitions = definitions
@@ -48,6 +39,11 @@ class FSM:
         self._accumulated_name: str = ""
 
     def set_function(self, name: str) -> bool:
+        """Tries to match name to a known function and select it.
+
+        Returns:
+            True if matched, False otherwise.
+        """
         for func in self.definitions:
             if name == func.name:
                 self.selected_func = func
@@ -57,15 +53,24 @@ class FSM:
         return False
 
     def get_current_param(self) -> str:
+        """Returns the current parameter name."""
         return self._params[self._current_param_pos]
 
     def get_current_param_type(self) -> str | None:
+        """Returns the current parameter type.
+
+        Returns None if not in PARAM_VALUE state.
+        """
         if self.state != FSMState.PARAM_VALUE or not self.selected_func:
             return None
         param = self.get_current_param()
         return self.selected_func.parameters[param].type
 
     def next_param(self) -> None:
+        """Advances to the next parameter.
+
+        Transitions to END if no parameters remain.
+        """
         self._current_param_pos += 1
         if self._current_param_pos == len(self._params):
             self.state = FSMState.END
@@ -74,6 +79,14 @@ class FSM:
             self,
             vocabs: dict[int, str]
     ) -> list[int]:
+        """Returns valid token IDs for the current state.
+
+        Args:
+            vocabs: Mapping of token ID to token string.
+
+        Returns:
+            List of valid token IDs.
+        """
         valid_ids: list[int] = []
         if self.state == FSMState.NAME:
             functions = [d.name for d in self.definitions]
@@ -102,6 +115,10 @@ class FSM:
         return []
 
     def feed(self, token_str: str) -> None:
+        """Accumulates token_str and updates state.
+
+        Transitions to PARAM_VALUE when a function name is matched.
+        """
         if self.state == FSMState.NAME:
             self._accumulated_name += token_str
             if self.set_function(self._accumulated_name):

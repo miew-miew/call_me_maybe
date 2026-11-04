@@ -18,10 +18,10 @@ def load_vocab(path: str) -> dict[int, str]:
     """Load the vocabulary file and map token IDs to tokens.
 
     Args:
-        path (str): The path to the vocabulary file.
+        path: Path to the vocabulary file.
 
     Returns:
-        dict[int, str]: A dictionary mapping token IDs to tokens.
+        A dictionary mapping token IDs to tokens.
     """
     with open(path) as file:
         content = file.read()
@@ -33,14 +33,14 @@ def mask_logits(
     logits: list[float],
     valid_ids: list[int]
 ) -> list[float]:
-    """Mask the logits of invalid tokens with negative infinity.
+    """Mask logits of invalid tokens with negative infinity.
 
     Args:
-        logits (list[float]): The logits for each token.
-        valid_ids (list[int]): The IDs of valid tokens.
+        logits: The logits for each token.
+        valid_ids: The IDs of valid tokens.
 
     Returns:
-        list[float]: The logits with invalid tokens masked.
+        The logits with invalid tokens masked.
     """
     masked: list[float] = [-float("inf")] * len(logits)
     for id in valid_ids:
