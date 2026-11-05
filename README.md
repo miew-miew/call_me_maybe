@@ -68,7 +68,11 @@ The second challenge was knowing when to stop generating parameter values, espec
 
 ## Testing Strategy
 
-blabla
+The implementation was tested using different prompts and predefined function definitions to verify that:
+
+- The model follows the provided function definitions.
+- The correct function name is selected.
+- The parameters are correctly extracted according to the function schema.
 
 ## Example Usage
 
