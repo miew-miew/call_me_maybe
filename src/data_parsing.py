@@ -7,10 +7,11 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/30 04:32:33 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/03 08:41:42 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/05 10:06:32 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
+import json
 from typing import TypeVar
 from pydantic import TypeAdapter, ValidationError
 from .data_loader import load_content
@@ -23,13 +24,15 @@ M = TypeVar('M', bound=Prompt | FunctionDefinition)
 
 def parse_file(
     filepath: str,
-    model: type[M]
+    model: type[M],
+    skip_invalid: bool = False,
 ) -> list[M] | None:
     """Parse a JSON file into a list of model instances.
 
     Args:
         filepath: Path to the JSON file.
         model: The model class used for validation.
+        skip_invalid: If True, skip invalid entries instead of failing.
 
     Returns:
         The validated list of models, or None if parsing fails.
@@ -38,21 +41,33 @@ def parse_file(
     if not content or content.strip() == '':
         print(f"No content found in {filepath}")
         return None
-    adapter = TypeAdapter(list[M])
-    try:
-        return adapter.validate_json(content)
-    except ValidationError as e:
-        print_validation_errors(e)
-        return None
+    if not skip_invalid:
+        adapter = TypeAdapter(list[M])
+        try:
+            return adapter.validate_json(content)
+        except ValidationError as e:
+            print_validation_errors(e)
+            return None
+    adapter = TypeAdapter(model)
+    valid: list[M] = []
+    for item in json.loads(content):
+        try:
+            valid.append(adapter.validate_python(item))
+        except ValidationError as e:
+            print_validation_errors(e)
+            print("[ERROR] Skipping invalid entry")
+    return valid or None
 
 
 def parse_prompts() -> list[Prompt] | None:
-    """Parse the prompts from the JSON file.
+    """Parse the prompts from the JSON file, skipping invalid entries.
 
     Returns:
-        The list of prompts, or None if parsing fails.
+        The list of valid prompts, or None if the file cannot be loaded.
     """
-    return parse_file("data/input/function_calling_tests.json", Prompt)
+    return parse_file(
+        "data/input/function_calling_tests.json", Prompt, skip_invalid=True
+    )
 
 
 def parse_functions_definition() -> list[FunctionDefinition] | None:
