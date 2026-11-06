@@ -2,21 +2,22 @@
 # ########################################################################### #
 #   shebang: 1                                                                #
 #                                                          :::      ::::::::  #
-#   fsm.py                                               :+:      :+:    :+:  #
+#   _fsm.py                                              :+:      :+:    :+:  #
 #                                                      +:+ +:+         +:+    #
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: Invalid date        by                     #+#    #+#            #
-#   Updated: 2026/11/03 10:40:53 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/06 08:31:46 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 from enum import Enum
-from .models import FunctionDefinition
+from ._models import FunctionDefinition
 
 
 class FSMState(Enum):
     """Possible states of the FSM."""
+
     NAME = "name"
     PARAM_VALUE = "param_value"
     END = "end"
@@ -39,7 +40,7 @@ class FSM:
         self._accumulated_name: str = ""
 
     def set_function(self, name: str) -> bool:
-        """Tries to match name to a known function and select it.
+        """Try to match name to a known function and select it.
 
         Returns:
             True if matched, False otherwise.
@@ -53,11 +54,11 @@ class FSM:
         return False
 
     def get_current_param(self) -> str:
-        """Returns the current parameter name."""
+        """Return the current parameter name."""
         return self._params[self._current_param_pos]
 
     def get_current_param_type(self) -> str | None:
-        """Returns the current parameter type.
+        """Return the current parameter type.
 
         Returns None if not in PARAM_VALUE state.
         """
@@ -67,7 +68,7 @@ class FSM:
         return self.selected_func.parameters[param].type
 
     def next_param(self) -> None:
-        """Advances to the next parameter.
+        """Advance to the next parameter.
 
         Transitions to END if no parameters remain.
         """
@@ -79,7 +80,7 @@ class FSM:
             self,
             vocabs: dict[int, str]
     ) -> list[int]:
-        """Returns valid token IDs for the current state.
+        """Return valid token IDs for the current state.
 
         Args:
             vocabs: Mapping of token ID to token string.
@@ -115,7 +116,7 @@ class FSM:
         return []
 
     def feed(self, token_str: str) -> None:
-        """Accumulates token_str and updates state.
+        """Accumulate token_str and updates state.
 
         Transitions to PARAM_VALUE when a function name is matched.
         """

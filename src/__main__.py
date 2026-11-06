@@ -7,19 +7,20 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:51:45 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/03 08:33:55 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/06 08:38:14 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
+"""Main entry point for the application."""
 from typing import Any
 import json
 import os
 import numpy
-from .data_parsing import parse_functions_definition, parse_prompts
+from ._data_parsing import parse_functions_definition, parse_prompts
 from llm_sdk import Small_LLM_Model  # type: ignore
-from .fsm import FSM, FSMState
-from .constrained import load_vocab, mask_logits
-from .models import OutputValidator
+from ._fsm import FSM, FSMState
+from ._constrained import load_vocab, mask_logits
+from ._models import OutputValidator
 
 
 def build_system_prompt(user_prompt: str) -> str:

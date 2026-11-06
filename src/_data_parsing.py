@@ -2,21 +2,21 @@
 # ########################################################################### #
 #   shebang: 1                                                                #
 #                                                          :::      ::::::::  #
-#   data_parsing.py                                      :+:      :+:    :+:  #
+#   _data_parsing.py                                     :+:      :+:    :+:  #
 #                                                      +:+ +:+         +:+    #
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/30 04:32:33 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/05 10:06:32 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/06 08:29:10 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 import json
 from typing import TypeVar
 from pydantic import TypeAdapter, ValidationError
-from .data_loader import load_content
-from .models import Prompt, FunctionDefinition
-from .validation_errors import print_validation_errors
+from ._data_loader import load_content
+from ._models import Prompt, FunctionDefinition
+from ._validation_errors import print_validation_errors
 
 
 M = TypeVar('M', bound=Prompt | FunctionDefinition)
