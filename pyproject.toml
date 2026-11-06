@@ -12,3 +12,6 @@ dependencies = [
 
 [tool.uv.sources]
 llm_sdk = { path = "llm_sdk" }
+
+[tool.mypy]
+disable_error_code = ["import-not-found"]

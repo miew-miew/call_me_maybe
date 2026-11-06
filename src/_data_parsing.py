@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/30 04:32:33 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/06 08:29:10 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/06 13:15:28 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -48,11 +48,11 @@ def parse_file(
         except ValidationError as e:
             print_validation_errors(e)
             return None
-    adapter = TypeAdapter(model)
+    item_adapter = TypeAdapter(model)
     valid: list[M] = []
     for item in json.loads(content):
         try:
-            valid.append(adapter.validate_python(item))
+            valid.append(item_adapter.validate_python(item))
         except ValidationError as e:
             print_validation_errors(e)
             print("[ERROR] Skipping invalid entry")

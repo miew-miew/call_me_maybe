@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: Invalid date        by                     #+#    #+#            #
-#   Updated: 2026/11/06 08:31:46 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/06 13:23:21 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -32,7 +32,7 @@ class FSM:
         Args:
             definitions: Available function definitions to match against.
         """
-        self.state = FSMState.NAME
+        self.state: FSMState = FSMState.NAME
         self.definitions = definitions
         self.selected_func: FunctionDefinition | None = None
         self._params: list[str] = []

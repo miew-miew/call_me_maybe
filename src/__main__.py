@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:51:45 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/06 08:38:14 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/06 13:39:23 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -86,7 +86,7 @@ def main() -> None:
     model = Small_LLM_Model()
     vocab_path: str = model.get_path_to_vocab_file()
     vocabs: dict[int, str] = load_vocab(vocab_path)
-    results: list[dict[str, float | str]] = []
+    results: list[dict[str, Any]] = []
     for p in prompts:
         fsm = FSM(definitions)
         full_prompt = build_system_prompt(p.prompt)
@@ -147,7 +147,7 @@ def main() -> None:
             if param_type == "string":
                 param_dict[param] = value
             fsm.next_param()
-            if fsm.state != FSMState.END:
+            if str(fsm.state) != str(FSMState.END):
                 emit_fixed(ids_array, model, ", ")
         emit_fixed(ids_array, model, "}}")
 
@@ -156,7 +156,11 @@ def main() -> None:
             "name": fsm.selected_func.name,
             "parameters": param_dict
         }
-        OutputValidator(**result)
+        OutputValidator(
+            prompt=p.prompt,
+            name=fsm.selected_func.name,
+            parameters=param_dict,
+        )
         results.append(result)
 
     output_path = "data/output/function_calling_results.json"

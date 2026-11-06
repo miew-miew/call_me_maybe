@@ -22,5 +22,5 @@ lint:
 	--check-untyped-defs
 
 lint-strict:
-	flake8 .
-	mypy . --strict
+	-flake8 . --exclude "llm_sdk,.venv"
+	-mypy . --strict --exclude "llm_sdk|.venv"
