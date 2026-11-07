@@ -2,12 +2,12 @@
 # ########################################################################### #
 #   shebang: 1                                                                #
 #                                                          :::      ::::::::  #
-#   models.py                                            :+:      :+:    :+:  #
+#   _models.py                                           :+:      :+:    :+:  #
 #                                                      +:+ +:+         +:+    #
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:05:11 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/02 10:07:13 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/07 14:39:43 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -32,8 +32,8 @@ class ParamType(BaseModel):
 class FunctionDefinition(BaseModel):
     """A callable function definition with its parameters and return type."""
 
-    name: str = Field(...)
-    description: str = Field(...)
+    name: str = Field(..., min_length=5)
+    description: str = Field(..., min_length=5)
     parameters: dict[str, ParamType] = Field(...)
     returns: ParamType = Field(...)
     model_config = ConfigDict(extra="forbid")

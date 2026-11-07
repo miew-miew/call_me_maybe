@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:51:45 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/06 13:39:23 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/07 14:42:15 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -156,6 +156,7 @@ def main() -> None:
             "name": fsm.selected_func.name,
             "parameters": param_dict
         }
+        print(result)
         OutputValidator(
             prompt=p.prompt,
             name=fsm.selected_func.name,

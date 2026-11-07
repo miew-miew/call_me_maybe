@@ -7,25 +7,26 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/30 04:32:33 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/06 13:15:28 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/07 15:32:32 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 import json
 from typing import TypeVar
-from pydantic import TypeAdapter, ValidationError
+from pydantic import BaseModel, ValidationError
 from ._data_loader import load_content
 from ._models import Prompt, FunctionDefinition
 from ._validation_errors import print_validation_errors
 
 
-M = TypeVar('M', bound=Prompt | FunctionDefinition)
+M = TypeVar('M', bound=BaseModel)
 
 
 def parse_file(
     filepath: str,
     model: type[M],
     skip_invalid: bool = False,
+    show_skip_warning: bool = False,
 ) -> list[M] | None:
     """Parse a JSON file into a list of model instances.
 
@@ -33,6 +34,8 @@ def parse_file(
         filepath: Path to the JSON file.
         model: The model class used for validation.
         skip_invalid: If True, skip invalid entries instead of failing.
+        show_skip_warning: Whether to print the skip notice for invalid
+            entries.
 
     Returns:
         The validated list of models, or None if parsing fails.
@@ -41,21 +44,28 @@ def parse_file(
     if not content or content.strip() == '':
         print(f"No content found in {filepath}")
         return None
+
+    try:
+        payload = json.loads(content)
+    except json.JSONDecodeError as e:
+        print(f"Invalid JSON in {filepath}: {e}")
+        return None
+
     if not skip_invalid:
-        adapter = TypeAdapter(list[M])
         try:
-            return adapter.validate_json(content)
+            return [model.model_validate(item) for item in payload]
         except ValidationError as e:
-            print_validation_errors(e)
+            print_validation_errors(e, filepath)
             return None
-    item_adapter = TypeAdapter(model)
+
     valid: list[M] = []
-    for item in json.loads(content):
+    for item in payload:
         try:
-            valid.append(item_adapter.validate_python(item))
+            valid.append(model.model_validate(item))
         except ValidationError as e:
-            print_validation_errors(e)
-            print("[ERROR] Skipping invalid entry")
+            print_validation_errors(e, filepath)
+            if show_skip_warning:
+                print("[ERROR] Skipping invalid entry")
     return valid or None
 
 
@@ -66,7 +76,10 @@ def parse_prompts() -> list[Prompt] | None:
         The list of valid prompts, or None if the file cannot be loaded.
     """
     return parse_file(
-        "data/input/function_calling_tests.json", Prompt, skip_invalid=True
+        "data/input/function_calling_tests.json",
+        Prompt,
+        skip_invalid=True,
+        show_skip_warning=True,
     )
 
 
@@ -76,5 +89,7 @@ def parse_functions_definition() -> list[FunctionDefinition] | None:
     Returns:
         The list of function definitions, or None if parsing fails.
     """
-    return parse_file("data/input/functions_definition.json",
-                      FunctionDefinition)
+    return parse_file(
+        "data/input/functions_definition.json",
+        FunctionDefinition
+    )
