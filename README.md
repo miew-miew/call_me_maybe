@@ -75,5 +75,6 @@ Results are written to `data/output/function_calling_results.json`.
 
 - [Pydantic docs](https://docs.pydantic.dev/)
 - [uv – Python Package Manager](https://docs.astral.sh/uv/)
+- [Constrained decoding](https://mbrenndoerfer.com/writing/constrained-decoding-structured-llm-output)
 
 AI was used to simplify docstrings and review this README.
