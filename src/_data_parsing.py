@@ -7,66 +7,35 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/30 04:32:33 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/07 15:32:32 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/08 12:18:24 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
 import json
-from typing import TypeVar
-from pydantic import BaseModel, ValidationError
+from typing import Any
+from pydantic import ValidationError
 from ._data_loader import load_content
 from ._models import Prompt, FunctionDefinition
 from ._validation_errors import print_validation_errors
 
 
-M = TypeVar('M', bound=BaseModel)
-
-
-def parse_file(
-    filepath: str,
-    model: type[M],
-    skip_invalid: bool = False,
-    show_skip_warning: bool = False,
-) -> list[M] | None:
-    """Parse a JSON file into a list of model instances.
+def parse_file(filepath: str) -> Any | None:
+    """Load and decode a JSON file.
 
     Args:
         filepath: Path to the JSON file.
-        model: The model class used for validation.
-        skip_invalid: If True, skip invalid entries instead of failing.
-        show_skip_warning: Whether to print the skip notice for invalid
-            entries.
 
     Returns:
-        The validated list of models, or None if parsing fails.
+        The parsed list, or None if loading or decoding fails.
     """
     content: str | None = load_content(filepath)
     if not content or content.strip() == '':
-        print(f"No content found in {filepath}")
         return None
-
     try:
-        payload = json.loads(content)
+        return json.loads(content)
     except json.JSONDecodeError as e:
         print(f"Invalid JSON in {filepath}: {e}")
         return None
-
-    if not skip_invalid:
-        try:
-            return [model.model_validate(item) for item in payload]
-        except ValidationError as e:
-            print_validation_errors(e, filepath)
-            return None
-
-    valid: list[M] = []
-    for item in payload:
-        try:
-            valid.append(model.model_validate(item))
-        except ValidationError as e:
-            print_validation_errors(e, filepath)
-            if show_skip_warning:
-                print("[ERROR] Skipping invalid entry")
-    return valid or None
 
 
 def parse_prompts() -> list[Prompt] | None:
@@ -75,12 +44,19 @@ def parse_prompts() -> list[Prompt] | None:
     Returns:
         The list of valid prompts, or None if the file cannot be loaded.
     """
-    return parse_file(
-        "data/input/function_calling_tests.json",
-        Prompt,
-        skip_invalid=True,
-        show_skip_warning=True,
-    )
+    filepath = "data/input/function_calling_tests.json"
+    raw = parse_file(filepath)
+    if raw is None or len(raw) == 0:
+        print("No available prompt.")
+        return None
+    valid: list[Prompt] = []
+    for item in raw:
+        try:
+            valid.append(Prompt.model_validate(item))
+        except ValidationError as e:
+            print_validation_errors(e, filepath)
+            print("[ERROR] Skipping invalid prompt.")
+    return valid or None
 
 
 def parse_functions_definition() -> list[FunctionDefinition] | None:
@@ -89,7 +65,13 @@ def parse_functions_definition() -> list[FunctionDefinition] | None:
     Returns:
         The list of function definitions, or None if parsing fails.
     """
-    return parse_file(
-        "data/input/functions_definition.json",
-        FunctionDefinition
-    )
+    filepath = "data/input/functions_definition.json"
+    raw = parse_file(filepath)
+    if raw is None or len(raw) == 0:
+        print("No available function definition.")
+        return None
+    try:
+        return [FunctionDefinition.model_validate(item) for item in raw]
+    except ValidationError as e:
+        print_validation_errors(e, filepath)
+        return None

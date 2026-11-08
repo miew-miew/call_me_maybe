@@ -2,77 +2,52 @@
 
 ## Description
 
-call me maybe is a function calling tool that translates natural language prompts into structured JSON function calls using a small LLM (Qwen3-0.6B).
+call me maybe translates natural language prompts into structured JSON function calls using a small LLM (Qwen3-0.6B) and constrained decoding.
 
-Given a prompt like "What is the sum of 2 and 3?", the program outputs:
+Given "What is the sum of 2 and 3?", it produces:
 
 ```json
 {"name": "fn_add_numbers", "parameters": {"a": 2.0, "b": 3.0}}
 ```
 
-The key idea is **constrained decoding**: instead of hoping the model generates valid JSON, we guide it token by token by masking out any token that would break the expected structure.
-
 ## Instructions
-
-**Install dependencies:**
 
 ```bash
 make install
-```
-
-**Run:**
-
-```bash
 uv run python -m src
-```
-
-**Lint:**
-
-```bash
-make lint
-```
-
-**Clean:**
-
-```bash
-make clean
 ```
 
 ## Algorithm Explanation
 
-The generation is split into two phases, both using constrained decoding:
+Generation happens in two phases:
 
-1. **Function name**: tokens are restricted to those that keep the accumulated string a valid prefix of a known function name. Once a full match is found, the FSM transitions to the next phase.
-2. **Parameter values**: for each parameter, tokens are restricted based on the declared type — digits, `.` and `-` for numbers, anything for strings (until a closing `"` is detected).
+1. Function name: only tokens that extend the current string toward a valid function name are allowed.
+2. Parameter values: tokens are restricted by type — numbers only accept digits, `.` and `-`; strings accept anything until a closing `"` is detected.
 
-At each step, invalid token logits are set to `-inf` before selecting the next token.
+At each step, invalid tokens are masked to `-inf` so the model can only pick valid ones.
 
 ## Design Decisions
 
-- A **Finite State Machine** (`FSM`) tracks the current generation phase and which parameter is being filled.
-- **Pydantic** is used for all input/output validation.
-- The vocabulary file is loaded once and reused across all prompts.
-- Output directory is created automatically at write time.
+- A Finite State Machine (FSM) tracks the current phase (NAME, PARAM_VALUE, END).
+- Pydantic validates all inputs and outputs. Invalid prompts are skipped individually.
+- The output directory is created after running the program.
 
 ## Performance Analysis
 
-- Achieves near-perfect function selection and argument extraction on well-formed prompts.
-- 100% valid JSON output guaranteed by construction.
-- Processes all prompts in well under 5 minutes.
+- Near-perfect accuracy on well-formed prompts.
+- 100% valid JSON guaranteed by construction.
+- Runs all prompts in under 5 minutes on standard hardware.
+- No crash — all errors are caught and printed.
 
 ## Challenges Faced
 
-The hardest part was designing the FSM — specifically deciding when to transition between states and how to handle partial token accumulation during function name matching.
+The hardest part was designing the FSM, especially understanding what states were needed and what each state should do.
 
-The second challenge was knowing when to stop generating parameter values, especially for strings (detecting the closing quote across multiple tokens).
+The second challenge was deciding when to stop generating parameter values — detecting an invalid float mid-stream for numbers, and finding the closing quote across multiple tokens for strings.
 
 ## Testing Strategy
 
-The implementation was tested using different prompts and predefined function definitions to verify that:
-
-- The model follows the provided function definitions.
-- The correct function name is selected.
-- The parameters are correctly extracted according to the function schema.
+Tested with different cases: missing files, invalid function definitions, and prompts that don't match any function.
 
 ## Example Usage
 
@@ -80,8 +55,7 @@ The implementation was tested using different prompts and predefined function de
 uv run python -m src
 ```
 
-Output written to `data/output/function_calling_results.json`:
-
+Results are written to `data/output/function_calling_results.json`.
 ```json
 [
   {
@@ -99,6 +73,7 @@ Output written to `data/output/function_calling_results.json`:
 
 ## Resources
 
-blabla
+- [Pydantic docs](https://docs.pydantic.dev/)
+- [uv – Python Package Manager](https://docs.astral.sh/uv/)
 
-AI was used to help simplify docstrings across the codebase and to review and correct this README.
+AI was used to simplify docstrings and review this README.

@@ -7,11 +7,11 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:05:11 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/07 14:39:43 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/08 12:00:11 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, model_validator
 from typing import Literal
 
 
@@ -37,6 +37,14 @@ class FunctionDefinition(BaseModel):
     parameters: dict[str, ParamType] = Field(...)
     returns: ParamType = Field(...)
     model_config = ConfigDict(extra="forbid")
+
+    @model_validator(mode="after")
+    def check_param_names(self) -> "FunctionDefinition":
+        """Ensure no parameter name is an empty string."""
+        for key in self.parameters:
+            if key.strip() == "":
+                raise Exception("parameters name shouldn't be empty.")
+        return self
 
 
 class OutputValidator(BaseModel):
