@@ -7,7 +7,7 @@
 #   By: frazanak <frazanak@student.42antananarivo.   +#+  +:+       +#+       #
 #                                                  +#+#+#+#+#+   +#+          #
 #   Created: 2026/09/29 10:51:45 by frazanak            #+#    #+#            #
-#   Updated: 2026/11/07 14:42:15 by frazanak           ###   ########.fr      #
+#   Updated: 2026/11/08 13:14:17 by frazanak           ###   ########.fr      #
 #                                                                             #
 # ########################################################################### #
 
@@ -15,24 +15,46 @@
 from typing import Any
 import json
 import os
+import argparse
 import numpy
 from ._data_parsing import parse_functions_definition, parse_prompts
 from llm_sdk import Small_LLM_Model  # type: ignore
 from ._fsm import FSM, FSMState
 from ._constrained import load_vocab, mask_logits
-from ._models import OutputValidator
+from ._models import FunctionDefinition, OutputValidator
 
 
-def build_system_prompt(user_prompt: str) -> str:
+def parse_args() -> argparse.Namespace:
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--functions_definition",
+        default="data/input/functions_definition.json"
+    )
+    parser.add_argument(
+        "--input",
+        default="data/input/function_calling_tests.json"
+    )
+    parser.add_argument(
+        "--output",
+        default="data/output/function_calling_results.json"
+    )
+    return parser.parse_args()
+
+
+def build_system_prompt(
+    user_prompt: str,
+    definitions: list[FunctionDefinition]
+) -> str:
     """Build a system prompt with available functions and the user request.
 
     Args:
         user_prompt: The user's request.
+        definitions: Available function definitions.
 
     Returns:
         The formatted system prompt.
     """
-    definitions = parse_functions_definition()
     if not definitions:
         return user_prompt
 
@@ -77,10 +99,11 @@ def emit_fixed(
 
 def main() -> None:
     """Run the function-calling pipeline and write results to JSON."""
-    prompts = parse_prompts()
+    args = parse_args()
+    prompts = parse_prompts(args.input)
     if not prompts:
         return
-    definitions = parse_functions_definition()
+    definitions = parse_functions_definition(args.functions_definition)
     if not definitions:
         return
     model = Small_LLM_Model()
@@ -89,7 +112,7 @@ def main() -> None:
     results: list[dict[str, Any]] = []
     for p in prompts:
         fsm = FSM(definitions)
-        full_prompt = build_system_prompt(p.prompt)
+        full_prompt = build_system_prompt(p.prompt, definitions)
         ids_array: list[int] = numpy.array(model.encode(full_prompt),
                                            copy=None)[0].tolist()
 
@@ -164,9 +187,8 @@ def main() -> None:
         )
         results.append(result)
 
-    output_path = "data/output/function_calling_results.json"
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, "w") as file:
+    os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
+    with open(args.output, "w") as file:
         json.dump(results, file, indent=2)
 
 
